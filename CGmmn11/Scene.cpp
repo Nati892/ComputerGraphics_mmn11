@@ -5,20 +5,10 @@ int AspectRatioDenominator;
 int CurrentSceneWidth = 800;
 int CurrentSceneHeight = 600;
 
-void DrawTree(int x, int y)
-{
-
-}
-
-void DrawTrees()
-{
-
-
-}
 
 void DrawBackgound()
 {
-	//grass
+	//gradiant grass
 	for (float i = 0.0f; i < 0.4f; i += 0.001)
 	{
 		glColor3f(0.0f, 0.3f + i, 0.0f);
@@ -52,7 +42,6 @@ void FixAspectRatio()
 	if (WinAR > RefAR)
 	{
 		finalW = ((double)AspectRatioNumerator * (double)CurrentSceneHeight) / (double)AspectRatioDenominator;
-
 	}
 
 	//if window Height is highr in ratio then fix it(lower it)
@@ -61,7 +50,11 @@ void FixAspectRatio()
 		finalH = ((double)AspectRatioDenominator * (double)CurrentSceneWidth) / (double)AspectRatioNumerator;
 	}
 
-	glViewport((CurrentSceneWidth - finalW) / 2, (CurrentSceneHeight - finalH) / 2, finalW, finalH);
+	//Center view port in window
+	int StartPos_X = (CurrentSceneWidth - finalW) / 2;
+	int StartPos_Y = (CurrentSceneHeight - finalH) / 2;
+
+	glViewport(StartPos_X, StartPos_Y, finalW, finalH);
 }
 //set callbacks
 void DisplayCallback()
@@ -75,6 +68,7 @@ void DisplayCallback()
 	glutSwapBuffers();
 }
 
+//window resize callback
 void ReshapeCallback(int w, int h)
 {
 	CurrentSceneWidth = w;
@@ -83,13 +77,13 @@ void ReshapeCallback(int w, int h)
 	glutPostRedisplay();
 }
 
+//Mouse events
 void MouseEventCallback(int button, int state, int x, int y)
 {
 
-	if (!state)
-		glutPostRedisplay();
 }
 
+//Keybard events
 void KeyboardEventCallback(unsigned char c, int x, int y)
 {
 
