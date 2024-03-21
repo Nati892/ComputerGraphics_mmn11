@@ -3,15 +3,19 @@
 #define STAR_LINE_DELTA 0.004
 #define GRASS_HEIGHT 0.4f
 #define GRADIANT_INTERVAL 0.001f
-#define AmountOfStars 60
+#define AMOUNT_OF_STARS 60
+#define AMOUNT_OF_TREES 40
 #define MOON_RADIUS 0.05f
 #define PI 3.14159265f
+#define TREE_BARK_HEIGHT 0.05
+#define TREE_BARK_WIDTH 0.005
 
 int AspectRatioNumerator;
 int AspectRatioDenominator;
 int CurrentSceneWidth = 800;
 int CurrentSceneHeight = 600;
-float StarPositions[AmountOfStars * 2];
+float StarPositions[AMOUNT_OF_STARS * 2];
+float TreePositions[AMOUNT_OF_TREES * 2];
 
 void DrawBackgound()
 {
@@ -29,16 +33,13 @@ void DrawBackgound()
 		glRectf(0.0f, 0.0f + i, 1.0f, i + GRADIANT_INTERVAL);
 	}
 
-	//white rect for test
-	glColor3f(0.8f, 0.8f, 0.8f);
-	glRectf(0.4f, 0.4f, 0.6f, 0.6f);
 
 }
 
 void InitStarValues()
 {
 	float rand_num = 0.0f;
-	for (int i = 0; i < AmountOfStars * 2; i++)
+	for (int i = 0; i < AMOUNT_OF_STARS * 2; i++)
 	{
 		if (i % 2 == 0)
 		{
@@ -49,6 +50,23 @@ void InitStarValues()
 			rand_num = RandInRange(GRASS_HEIGHT, 1.0f);//star's y_pos
 		}
 		StarPositions[i] = rand_num;
+	}
+}
+
+void InitTreeValues()
+{
+	float rand_num = 0.0f;
+	for (int i = 0; i < AMOUNT_OF_TREES * 2; i++)
+	{
+		if (i % 2 == 0)
+		{
+			rand_num = RandInRange(0, 1.0f);//tree's x_pos
+		}
+		else
+		{
+			rand_num = RandInRange(0, GRASS_HEIGHT);//tree's y_pos
+		}
+		TreePositions[i] = rand_num;
 	}
 }
 
@@ -69,66 +87,93 @@ void DrawStar(float x, float y)
 	glEnd();
 }
 
-void DrawFullMoon(float x, float y)
+//Draws a circle
+void DrawCircle(float center_x, float center_y, float radius)
 {
-	glColor3f(0.85f, 0.85f, 0.85f);//set moon color to be bright but not as bright as the stars
 	glBegin(GL_POLYGON);
-
 	//draw all the upper right quadrent of the circle
 	//iterating x from right corner to middle point
 	//and calculating the height using trigo
-	std::cout << "start" << std::endl;
-	for (float i = MOON_RADIUS; i >= 0; i -= 0.0005f)
+	for (float i = radius; i >= 0; i -= 0.0005f)
 	{
-		float calc_alpha = acosf(i / MOON_RADIUS);
-		float calc_y = y + sinf(calc_alpha) * MOON_RADIUS;
+		float calc_alpha = acosf(i / radius);//calcualte triangle angle
+		float calc_y = center_y + sinf(calc_alpha) * radius;//use angle to calculate height
 
-		glVertex2f(x + i, calc_y);
+		glVertex2f(center_x + i, calc_y);
 	}
-	glVertex2f(x , y+MOON_RADIUS);
+	glVertex2f(center_x, center_y + radius);
 
 	//draw all the upper left quadrent of the circle
-	for (float i = 0; i <= MOON_RADIUS; i += 0.0005f)
+	for (float i = 0; i <= radius; i += 0.0005f)
 	{
-		float calc_alpha = acosf(i / MOON_RADIUS);
-		float calc_y = y + sinf(calc_alpha) * MOON_RADIUS;
+		float calc_alpha = acosf(i / radius);
+		float calc_y = center_y + sinf(calc_alpha) * radius;
 
-		glVertex2f(x - i, calc_y);
+		glVertex2f(center_x - i, calc_y);
 	}
-	glVertex2f(x - MOON_RADIUS, y);
+	glVertex2f(center_x - radius, center_y);
 
 	//draw all the upper left quadrent of the circle
-	for (float i = MOON_RADIUS; i >= 0; i -= 0.0005f)
+	for (float i = radius; i >= 0; i -= 0.0005f)
 	{
-		float calc_alpha = acosf(i / MOON_RADIUS);
-		float calc_y = y - sinf(calc_alpha) * MOON_RADIUS;
+		float calc_alpha = acosf(i / radius);
+		float calc_y = center_y - sinf(calc_alpha) * radius;
 
-		glVertex2f(x - i, calc_y);
+		glVertex2f(center_x - i, calc_y);
 	}
-	glVertex2f(x , y-MOON_RADIUS);
+	glVertex2f(center_x, center_y - radius);
 
 	//draw all the upper left quadrent of the circle
-	for (float i = 0; i <= MOON_RADIUS; i += 0.0005f)
+	for (float i = 0; i <= radius; i += 0.0005f)
 	{
-		float calc_alpha = acosf(i / MOON_RADIUS);
-		float calc_y = y - sinf(calc_alpha) * MOON_RADIUS;
+		float calc_alpha = acosf(i / radius);
+		float calc_y = center_y - sinf(calc_alpha) * radius;
 
-		glVertex2f(x + i, calc_y);
+		glVertex2f(center_x + i, calc_y);
 	}
 	glEnd();
 }
 
-//draws all the stars on the night's sky, random position
+void DrawFullMoon(float center_x, float center_y, float radius)
+{
+	glColor3f(0.85f, 0.85f, 0.85f);//set moon color to be bright but not as bright as the stars
+	DrawCircle(center_x, center_y, radius);
+
+}
+
+//Draws all the stars on the night's sky, random position
 void DrawStars()
 {
-	for (int i = 0; i < AmountOfStars; i++)
+	for (int i = 0; i < AMOUNT_OF_STARS; i++)
 	{
 		float rand_x = StarPositions[i * 2];
 		float rand_y = StarPositions[i * 2 + 1];
 		DrawStar(rand_x, rand_y);
 	}
-
 }
+
+//Draw tree at position
+void DrawTree(float base_x, float base_y)
+{
+	glColor3f(0.6f, 0.29f, 0.0);
+	glRectf(base_x, base_y, base_x + TREE_BARK_WIDTH, base_y + TREE_BARK_HEIGHT);
+
+	glColor3f(0.0f, 0.29f, 0.0);
+	DrawCircle(base_x + TREE_BARK_WIDTH / 2.0f, base_y + TREE_BARK_HEIGHT + 0.005, 0.01);
+}
+
+//Draws all the stars on the night's sky, random position
+void DrawTrees()
+{
+	for (int i = 0; i < AMOUNT_OF_TREES; i++)
+	{
+		float rand_x = TreePositions[i * 2];
+		float rand_y = TreePositions[i * 2 + 1];
+		DrawTree(rand_x, rand_y);
+	}
+}
+
+
 
 //fixes the current aspect ratio
 void FixAspectRatio()
@@ -170,8 +215,8 @@ void DisplayCallback()
 
 	DrawBackgound();
 	DrawStars();
-	DrawFullMoon(0.2f, 0.85f);
-
+	DrawFullMoon(0.2f, 0.85f, MOON_RADIUS);
+	DrawTrees();
 	glutSwapBuffers();
 }
 
@@ -219,6 +264,7 @@ void MyInit(int argc, char** argv)
 	glutInitWindowPosition(0, 0);
 	glutCreateWindow("Maman11:Towers of annoying");
 	InitStarValues();
+	InitTreeValues();
 	//gl init stuff
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
