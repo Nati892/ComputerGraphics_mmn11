@@ -1,6 +1,7 @@
 #include "Utils.h"
 
 
+//Helper method for RandomFloatNumberGeneration
 float RandInRange(float start, float end) {
     // Seed the random num generator
     std::random_device rd;

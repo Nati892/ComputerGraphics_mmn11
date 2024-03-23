@@ -139,18 +139,7 @@ void MyBasicButton::SetColor(float red, float green, float blue)
 	this->color_blue = blue;
 }
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="pos_t1x">Bottom rect bottom left corner points x</param>
-/// <param name="pos_t1y">Bottom rect bottom left corner points y</param>
-/// <param name="pos_t2x">Bottom rect top right corner points x</param>
-/// <param name="pos_t2y">Bottom rect top right corner points x</param>
-/// <param name="color_red">button color red component float_vec3 format</param>
-/// <param name="color_green">button color green component float_vec3 format</param>
-/// <param name="color_blue">button color blue component float_vec3 format</param>
-/// <param name="onClick_Callback">onclick callback function</param>
-/// <param name="text">text opn button</param>
+
 MyBasicButton::MyBasicButton(float pos_t1x, float pos_t1y, float pos_t2x, float pos_t2y, float color_red, float color_green, float color_blue, void(*onClick_Callback)(), std::string text)
 {
 	this->pos_t1x = pos_t1x;
@@ -178,7 +167,6 @@ void MyBasicButton::CheckClick(float x, float y)
 		if (this->ClickedCallback != nullptr)
 		{
 			ClickedCallback();
-
 		}
 	}
 }
