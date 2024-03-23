@@ -1,41 +1,24 @@
 #include "Scene.h"
 
-#define STAR_LINE_DELTA 0.004
+#define PI 3.14159265f
 #define GRASS_HEIGHT 0.4f
 #define GRADIANT_INTERVAL 0.001f
 #define AMOUNT_OF_STARS 60
 #define AMOUNT_OF_TREES 40
 #define MOON_RADIUS 0.05f
-#define PI 3.14159265f
-#define TREE_BARK_HEIGHT 0.05
-#define TREE_BARK_WIDTH 0.005
+#define MY_NAME "Netanel Cohen Gindi"
+#define MY_HEADER "Beautiful Night"
+
 
 int AspectRatioNumerator;
 int AspectRatioDenominator;
+int currentWindowWidth;
+int currentWindowHeight;
 int CurrentSceneWidth = 800;
 int CurrentSceneHeight = 600;
 float StarPositions[AMOUNT_OF_STARS * 2];
 float TreePositions[AMOUNT_OF_TREES * 2];
-
-void DrawBackgound()
-{
-	//gradiant grass
-	for (float i = 0.0f; i < GRASS_HEIGHT; i += GRADIANT_INTERVAL)
-	{
-		glColor3f(0.0f, 0.3f + i, 0.0f);
-		glRectf(0.0f, 0.0f + i, 1.0f, i + GRADIANT_INTERVAL);
-	}
-
-	//Night sky
-	for (float i = GRASS_HEIGHT; i < 1.0f; i += GRADIANT_INTERVAL)
-	{
-		glColor3f(0.0f, 0.0, 1.0f - i);
-		glRectf(0.0f, 0.0f + i, 1.0f, i + GRADIANT_INTERVAL);
-	}
-
-
-}
-
+std::vector<MyBasicButton*> Buttons;
 void InitStarValues()
 {
 	float rand_num = 0.0f;
@@ -70,70 +53,26 @@ void InitTreeValues()
 	}
 }
 
-//draws a star
-void DrawStar(float x, float y)
+//Draws the background: grass and sky
+void DrawBackgound()
 {
-	glColor3f(0.9f, 0.9f, 0.9f);//set star color to white
-	glBegin(GL_LINES);
+	//gradiant grass
+	for (float i = 0.0f; i < GRASS_HEIGHT; i += GRADIANT_INTERVAL)
+	{
+		glColor3f(0.0f, 0.3f + i, 0.0f);
+		glRectf(0.0f, 0.0f + i, 1.0f, i + GRADIANT_INTERVAL);
+	}
 
-	//horizontal line
-	glVertex2f(x - STAR_LINE_DELTA, y);
-	glVertex2f(x + STAR_LINE_DELTA, y);
+	//Night sky
+	for (float i = GRASS_HEIGHT; i < 1.0f; i += GRADIANT_INTERVAL)
+	{
+		glColor3f(0.0f, 0.0, 1.0f - i);
+		glRectf(0.0f, 0.0f + i, 1.0f, i + GRADIANT_INTERVAL);
+	}
 
-	//vertical line
-	glVertex2f(x, y - STAR_LINE_DELTA);
-	glVertex2f(x, y + STAR_LINE_DELTA);
-
-	glEnd();
 }
 
-//Draws a circle
-void DrawCircle(float center_x, float center_y, float radius)
-{
-	glBegin(GL_POLYGON);
-	//draw all the upper right quadrent of the circle
-	//iterating x from right corner to middle point
-	//and calculating the height using trigo
-	for (float i = radius; i >= 0; i -= 0.0005f)
-	{
-		float calc_alpha = acosf(i / radius);//calcualte triangle angle
-		float calc_y = center_y + sinf(calc_alpha) * radius;//use angle to calculate height
-
-		glVertex2f(center_x + i, calc_y);
-	}
-	glVertex2f(center_x, center_y + radius);
-
-	//draw all the upper left quadrent of the circle
-	for (float i = 0; i <= radius; i += 0.0005f)
-	{
-		float calc_alpha = acosf(i / radius);
-		float calc_y = center_y + sinf(calc_alpha) * radius;
-
-		glVertex2f(center_x - i, calc_y);
-	}
-	glVertex2f(center_x - radius, center_y);
-
-	//draw all the upper left quadrent of the circle
-	for (float i = radius; i >= 0; i -= 0.0005f)
-	{
-		float calc_alpha = acosf(i / radius);
-		float calc_y = center_y - sinf(calc_alpha) * radius;
-
-		glVertex2f(center_x - i, calc_y);
-	}
-	glVertex2f(center_x, center_y - radius);
-
-	//draw all the upper left quadrent of the circle
-	for (float i = 0; i <= radius; i += 0.0005f)
-	{
-		float calc_alpha = acosf(i / radius);
-		float calc_y = center_y - sinf(calc_alpha) * radius;
-
-		glVertex2f(center_x + i, calc_y);
-	}
-	glEnd();
-}
-
+//Draws the moon in the scene
 void DrawFullMoon(float center_x, float center_y, float radius)
 {
 	glColor3f(0.85f, 0.85f, 0.85f);//set moon color to be bright but not as bright as the stars
@@ -152,16 +91,6 @@ void DrawStars()
 	}
 }
 
-//Draw tree at position
-void DrawTree(float base_x, float base_y)
-{
-	glColor3f(0.6f, 0.29f, 0.0);
-	glRectf(base_x, base_y, base_x + TREE_BARK_WIDTH, base_y + TREE_BARK_HEIGHT);
-
-	glColor3f(0.0f, 0.29f, 0.0);
-	DrawCircle(base_x + TREE_BARK_WIDTH / 2.0f, base_y + TREE_BARK_HEIGHT + 0.005, 0.01);
-}
-
 //Draws all the stars on the night's sky, random position
 void DrawTrees()
 {
@@ -173,14 +102,42 @@ void DrawTrees()
 	}
 }
 
+//Draws the requested text on the top right corner of the window
+void DrawHeaders()
+{
+	glColor3f(0.8f, 0.0f, 0.8f);//write in yellow
+	DrawText(MY_HEADER, strlen(MY_HEADER), GLUT_BITMAP_HELVETICA_10, 0.87f, 0.95f);
 
+	glColor3f(1.0f, 0.0f, 0.0f);//write in red
+	DrawText(MY_NAME, strlen(MY_NAME), GLUT_BITMAP_TIMES_ROMAN_10, 0.87f, 0.9f);
+}
+
+
+void CleanupAndExit()
+{
+	while (!Buttons.empty())
+	{
+		auto button = Buttons.back();
+		button->~MyBasicButton();
+		Buttons.pop_back();
+	}
+	exit(0);
+}
+
+//Draws and exits button on the bottom right corner of the window
+void AddExitButton(float t1_x, float t1_y, float t2_x, float t2_y, const char* text)
+{
+	auto exit_button = new MyBasicButton(t1_x, t1_y, t2_x, t2_y, 0.1f, 0.1f, 0.1f, CleanupAndExit, text);
+	Buttons.push_back(exit_button);
+}
 
 //fixes the current aspect ratio
 void FixAspectRatio()
 {
-	int finalW = CurrentSceneWidth;
-	int finalH = CurrentSceneHeight;
-
+	int finalW = currentWindowWidth;
+	int finalH = currentWindowHeight;
+	CurrentSceneWidth = currentWindowWidth;
+	CurrentSceneHeight = currentWindowHeight;
 	//calculate current aspect ratio
 	double WinAR = (double)CurrentSceneWidth / (double)CurrentSceneHeight;
 	double RefAR = (double)AspectRatioNumerator / (double)AspectRatioDenominator;
@@ -190,21 +147,20 @@ void FixAspectRatio()
 	{
 		finalW = ((double)AspectRatioNumerator * (double)CurrentSceneHeight) / (double)AspectRatioDenominator;
 	}
+	CurrentSceneWidth = finalW;
 
 	//if window Height is highr in ratio then fix it(lower it)
 	if (WinAR < RefAR)
 	{
 		finalH = ((double)AspectRatioDenominator * (double)CurrentSceneWidth) / (double)AspectRatioNumerator;
 	}
+	CurrentSceneHeight = finalH;
 
 	//Center view port in window
-	int StartPos_X = (CurrentSceneWidth - finalW) / 2;
-	int StartPos_Y = (CurrentSceneHeight - finalH) / 2;
-
+	int StartPos_X = (currentWindowWidth - finalW) / 2;
+	int StartPos_Y = (currentWindowHeight - finalH) / 2;
 	glViewport(StartPos_X, StartPos_Y, finalW, finalH);
 }
-
-//Callbacks
 
 //Redraw callback
 void DisplayCallback()
@@ -217,14 +173,20 @@ void DisplayCallback()
 	DrawStars();
 	DrawFullMoon(0.2f, 0.85f, MOON_RADIUS);
 	DrawTrees();
+	DrawHeaders();
+	for (const auto& button : Buttons)
+	{
+		button->Draw();
+	}
 	glutSwapBuffers();
 }
 
 //window resize callback
 void ReshapeCallback(int w, int h)
 {
-	CurrentSceneWidth = w;
-	CurrentSceneHeight = h;
+	currentWindowWidth = w;
+	currentWindowHeight = h;
+
 
 	glutPostRedisplay();
 }
@@ -232,22 +194,29 @@ void ReshapeCallback(int w, int h)
 //Mouse events
 void MouseEventCallback(int button, int state, int x, int y)
 {
+	if (state == 0)
+		return;
+	float converted_x = ((float)x - ((float)currentWindowWidth - (float)CurrentSceneWidth) / 2) / (float)CurrentSceneWidth;
+	float converted_y = 1.0f - (((float)y - ((float)currentWindowHeight - (float)CurrentSceneHeight) / 2) / (float)CurrentSceneHeight);
 
+	for (const auto& btn : Buttons)
+	{
+		btn->CheckClick(converted_x, converted_y);
+	}
 }
 
 //Keybard events
 void KeyboardEventCallback(unsigned char c, int x, int y)
 {
-
 	switch (c)
 	{
 	case 'q':
 	case 'Q':
 		exit(0);
 	}
-
 }
 
+//my initiation function
 void MyInit(int argc, char** argv)
 {
 	//call init on glut
@@ -256,6 +225,9 @@ void MyInit(int argc, char** argv)
 	//window stuff
 	CurrentSceneWidth = 800;
 	CurrentSceneHeight = 600;
+	currentWindowWidth = CurrentSceneWidth;
+	currentWindowHeight = CurrentSceneHeight;
+
 	AspectRatioNumerator = CurrentSceneWidth;
 	AspectRatioDenominator = CurrentSceneHeight;
 
@@ -265,6 +237,8 @@ void MyInit(int argc, char** argv)
 	glutCreateWindow("Maman11:Towers of annoying");
 	InitStarValues();
 	InitTreeValues();
+	AddExitButton(0.9f, 0.0f, 1.0f, 0.05f, "Exit");
+
 	//gl init stuff
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -288,3 +262,4 @@ void RunScene(int argc, char** argv)
 	SetEvents();
 	glutMainLoop();
 }
+
