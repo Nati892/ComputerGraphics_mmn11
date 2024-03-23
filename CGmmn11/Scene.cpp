@@ -3,8 +3,9 @@
 #define PI 3.14159265f
 #define GRASS_HEIGHT 0.4f
 #define GRADIANT_INTERVAL 0.001f
-#define AMOUNT_OF_STARS 60
-#define AMOUNT_OF_TREES 40
+#define AMOUNT_OF_STARS 110
+#define AMOUNT_OF_TREES 60
+#define AMOUNT_OF_HOUSES 4
 #define MOON_RADIUS 0.05f
 #define MY_NAME "Netanel Cohen Gindi"
 #define MY_HEADER "Beautiful Night"
@@ -18,6 +19,7 @@ int CurrentSceneWidth = 800;
 int CurrentSceneHeight = 600;
 float StarPositions[AMOUNT_OF_STARS * 2];
 float TreePositions[AMOUNT_OF_TREES * 2];
+float HousePositions[AMOUNT_OF_HOUSES * 2];
 std::vector<MyBasicButton*> Buttons;
 void InitStarValues()
 {
@@ -47,11 +49,30 @@ void InitTreeValues()
 		}
 		else
 		{
-			rand_num = RandInRange(0, GRASS_HEIGHT);//tree's y_pos
+			rand_num = RandInRange(HOUSE_HEIGHT, GRASS_HEIGHT);//tree's y_pos
 		}
 		TreePositions[i] = rand_num;
 	}
 }
+
+void InitHouseValues()
+{
+	float num = 0.0f;
+	for (int i = 0; i < AMOUNT_OF_HOUSES * 2; i++)
+	{
+		if (i % 2 == 0)
+		{
+			num = (i / 2) * (HOUSE_WIDTH*2.5); //tree's x_pos
+		}
+		else
+		{
+			num = 0.005f;//tree's y_pos
+		}
+		HousePositions[i] = num;
+	}
+
+}
+
 
 //Draws the background: grass and sky
 void DrawBackgound()
@@ -102,6 +123,17 @@ void DrawTrees()
 	}
 }
 
+//Draws all the stars on the night's sky, random position
+void DrawHouses()
+{
+	for (int i = 0; i < AMOUNT_OF_HOUSES; i++)
+	{
+		float rand_x = HousePositions[i * 2];
+		float rand_y = HousePositions[i * 2 + 1];
+		DrawHouse(rand_x, rand_y);
+	}
+}
+
 //Draws the requested text on the top right corner of the window
 void DrawHeaders()
 {
@@ -125,8 +157,9 @@ void CleanupAndExit()
 }
 
 //Draws and exits button on the bottom right corner of the window
-void AddExitButton(float t1_x, float t1_y, float t2_x, float t2_y, const char* text)
+void InitButtons(float t1_x, float t1_y, float t2_x, float t2_y, const char* text)
 {
+	//Add exit button
 	auto exit_button = new MyBasicButton(t1_x, t1_y, t2_x, t2_y, 0.1f, 0.1f, 0.1f, CleanupAndExit, text);
 	Buttons.push_back(exit_button);
 }
@@ -174,6 +207,7 @@ void DisplayCallback()
 	DrawFullMoon(0.2f, 0.85f, MOON_RADIUS);
 	DrawTrees();
 	DrawHeaders();
+	DrawHouses();
 	for (const auto& button : Buttons)
 	{
 		button->Draw();
@@ -237,7 +271,8 @@ void MyInit(int argc, char** argv)
 	glutCreateWindow("Maman11:Towers of annoying");
 	InitStarValues();
 	InitTreeValues();
-	AddExitButton(0.9f, 0.0f, 1.0f, 0.05f, "Exit");
+	InitHouseValues();
+	InitButtons(0.9f, 0.0f, 1.0f, 0.05f, "Exit");
 
 	//gl init stuff
 	glMatrixMode(GL_PROJECTION);

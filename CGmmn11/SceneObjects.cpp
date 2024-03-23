@@ -64,13 +64,14 @@ void DrawCircle(float center_x, float center_y, float radius)
 	glEnd();
 }
 
-
 //Draw tree at position
 void DrawTree(float base_x, float base_y)
 {
+	//Draw brown bark
 	glColor3f(0.6f, 0.29f, 0.0);
 	glRectf(base_x, base_y, base_x + TREE_BARK_WIDTH, base_y + TREE_BARK_HEIGHT);
 
+	//draw green head
 	glColor3f(0.0f, 0.29f, 0.0);
 	DrawCircle(base_x + TREE_BARK_WIDTH / 2.0f, base_y + TREE_BARK_HEIGHT + 0.005, 0.01);
 }
@@ -88,7 +89,36 @@ void DrawText(const char* text, int text_length, void* font, GLfloat x_pos, GLfl
 	}
 }
 
-//button class
+//Draws house to scene at given position
+void DrawHouse(float base_x, float base_y)
+{
+	//Draw gray stone Body
+	glColor3f(0.7f, 0.7f, 0.7f);
+	glRectf(base_x, base_y, base_x + HOUSE_WIDTH, base_y + HOUSE_HEIGHT);
+
+	//Draw Wooden roof
+	glColor3f(0.4f, 0.22f, 0.0);
+	glBegin(GL_POLYGON);
+	glVertex2f(base_x, base_y + HOUSE_HEIGHT);
+	glVertex2f(base_x + HOUSE_WIDTH, base_y + HOUSE_HEIGHT);
+	glVertex2f(base_x + (HOUSE_WIDTH / 2), HOUSE_HEIGHT + base_y + (HOUSE_HEIGHT / 2));
+	glEnd();
+
+	//Draw wooden door
+	glColor3f(0.4f, 0.22f, 0.0);
+	glRectf(base_x + (HOUSE_WIDTH - HOUSE_DOOR_WIDTH) / 2, base_y, base_x + HOUSE_WIDTH - (HOUSE_WIDTH - HOUSE_DOOR_WIDTH) / 2, base_y + HOUSE_DOOR_HEIGHT);
+
+	//Draw left window
+	glColor3f(0.8f, 0.8f, 0.4f);
+	glRectf(base_x + (HOUSE_WINDOW_LENGTH / 2), base_y + HOUSE_WINDOW_HEIGHT, base_x + HOUSE_WINDOW_LENGTH * 1.5f, base_y + HOUSE_WINDOW_HEIGHT + HOUSE_WINDOW_LENGTH);
+
+	//Draw second window
+	glRectf(base_x + HOUSE_WIDTH - (HOUSE_WINDOW_LENGTH * 1.5), base_y + HOUSE_WINDOW_HEIGHT, base_x + HOUSE_WIDTH - (HOUSE_WINDOW_LENGTH / 2), base_y + HOUSE_WINDOW_HEIGHT + HOUSE_WINDOW_LENGTH);
+
+	DrawTree(base_x + HOUSE_WIDTH * 1.5f,base_y);
+}
+
+//Basic button class
 void MyBasicButton::Draw()
 {
 	//Draw rect
